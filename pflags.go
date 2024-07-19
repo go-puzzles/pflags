@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-puzzles/cores/discover"
+	"github.com/go-puzzles/cores/share"
 	"github.com/go-puzzles/pflags/reader"
 	"github.com/go-puzzles/pflags/watcher"
 	"github.com/go-puzzles/plog"
@@ -25,8 +26,6 @@ var (
 	serviceName       StringGetter
 	debug             BoolGetter
 	config            StringGetter
-	consulAddr        StringGetter
-	useConsul         BoolGetter
 )
 
 type Option struct {
@@ -72,8 +71,8 @@ func Viper() *viper.Viper {
 }
 
 func initConsulFlag() {
-	useConsul = Bool("useConsul", true, "Whether to use the consul service center.")
-	consulAddr = String("consulAddr", discover.GetConsulAddress(), "Set the conusl addr.")
+	share.UseConsul = Bool("useConsul", true, "Whether to use the consul service center.")
+	share.ConsulAddr = String("consulAddr", discover.GetConsulAddress(), "Set the conusl addr.")
 }
 
 func initViper(opt *Option) {
@@ -152,7 +151,7 @@ func readConfig(opt *Option) {
 	}
 
 	// set use consul in flags parse but cancel it in command line
-	if opt.useConsul && !useConsul.Value() {
+	if opt.useConsul && !BoolGetter(share.UseConsul).Value() {
 		opt.configReader = localReader.NewLocalConfigReader()
 	}
 
@@ -172,7 +171,7 @@ func Parse(opts ...OptionFunc) {
 	if debug.Value() {
 		plog.Enable(level.LevelDebug)
 	}
-	if useConsul.Value() {
+	if BoolGetter(share.UseConsul).Value() {
 		discover.SetConsulFinderToDefault()
 	}
 
