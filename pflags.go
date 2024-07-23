@@ -66,6 +66,10 @@ func WithConfigWatcher(watchers ...watcher.ConfigWatcher) OptionFunc {
 	}
 }
 
+func OverrideDefaultConfigFile(configFile string) {
+	defaultConfigFile = configFile
+}
+
 func Viper() *viper.Viper {
 	return v
 }
